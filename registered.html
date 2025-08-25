@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registered Accounts</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+<div class="sidebar">
+  <div class="admin-info">
+    <img src="images/profile.png" alt="Profile" class="icon">
+    <span>Administration 1</span>
+  </div>
+
+  <a href="dashboard.html" class="sidebar-link">
+    <img src="images/home.png" alt="Dashboard" class="icon">
+    <span>Dashboard</span>
+  </a>
+
+  <a href="registered.html" class="sidebar-link">
+    <img src="images/users.png" alt="Registered Accounts" class="icon">
+    <span>Registered Accounts</span>
+  </a>
+
+  <a href="approval.html" class="sidebar-link">
+    <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+    <span>Account Approval Panel</span>
+  </a>
+
+  <a href="login.html" class="sidebar-link logout-link">
+    <img src="images/logout-ic.png" alt="Logout" class="icon">
+    <span>Logout</span>
+  </a>
+
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <h2>Expert Accounts</h2>
+      <p>Review and manage new expert registrations.</p>
+
+      <!-- Stats Cards -->
+      <div class="stats">
+        <div class="card">
+          <h3>Pending Approvals</h3>
+          <p class="number">3</p>
+        </div>
+        <div class="card">
+          <h3>New Applications Today</h3>
+          <p class="number">1</p>
+        </div>
+        <div class="card">
+          <h3>Total Experts</h3>
+          <p class="number">10</p>
+        </div>
+      </div>
+
+      <!-- Pending Accounts Table -->
+      <h3>Pending Accounts</h3>
+      <div class="pending-accounts">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Expertise</th>
+              <th>Application Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Mr. Sophia Clark</td>
+              <td>Pest Manager</td>
+              <td>2024-07-20</td>
+              <td><a href="pending.html" class="view-link">View Registration</a></td>
+            </tr>
+            <tr>
+              <td>Mr. Noah Harris</td>
+              <td>Pest Manager</td>
+              <td>2024-07-22</td>
+              <td><a href="pending.html" class="view-link">View Registration</a></td>
+            </tr>
+            <tr>
+              <td>Ms. Ava Morgan</td>
+              <td>Pest Manager</td>
+              <td>2024-07-25</td>
+              <td><a href="pending.html" class="view-link">View Registration</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approval</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+            <!-- Sidebar -->
+        <div class="sidebar">
+        <div class="admin-info">
+            <img src="images/profile.png" alt="Profile" class="icon">
+            <span>Administration 1</span>
+        </div>
+
+        <a href="dashboard.html" class="sidebar-link">
+            <img src="images/home.png" alt="Dashboard" class="icon">
+            <span>Dashboard</span>
+        </a>
+
+        <a href="registered.html" class="sidebar-link">
+            <img src="images/users.png" alt="Registered Accounts" class="icon">
+            <span>Registered Accounts</span>
+        </a>
+
+        <a href="approval.html" class="sidebar-link">
+            <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+            <span>Account Approval Panel</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link logout-link">
+            <img src="images/logout-ic.png" alt="Logout" class="icon">
+            <span>Logout</span>
+        </a>
+    </div>
+
+   <div class="content">
+      <h1>Account Approval</h1>
+      <p class="subtitle">Review and manage new expert registrations.</p>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="card">
+          <p>Total Experts</p>
+          <h2>5</h2>
+        </div>
+        <div class="card">
+          <p>Approved Experts</p>
+          <h2>5</h2>
+        </div>
+        <div class="card">
+          <p>Pending Experts</p>
+          <h2>3</h2>
+        </div>
+      </div>
+
+        <!-- Approved Accounts Table -->
+      <h3>Approved Accounts</h3>
+      <table class="approval-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Expertise</th>
+            <th>Application Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mr. Sam Clark</td>
+            <td>Pest Manager</td>
+            <td>2024-07-20</td>
+            <td><span class="status approved">Approved</span></td>
+          </tr>
+          <tr>
+            <td>Mr. Kurt Harris</td>
+            <td>Pest Manager</td>
+            <td>2024-07-22</td>
+            <td><span class="status approved">Approved</span></td>
+          </tr>
+          <tr>
+            <td>Ms. Ava Montana</td>
+            <td>Pest Manager</td>
+            <td>2024-07-25</td>
+            <td><span class="status approved">Approved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+</body>
+</html>
