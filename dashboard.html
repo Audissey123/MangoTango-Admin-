@@ -9,36 +9,36 @@
 <body>
   <div class="layout">
     <!-- Sidebar -->
-<div class="sidebar">
-  <div class="admin-info">
-    <img src="images/profile.png" alt="Profile" class="icon">
-    <span>Administration 1</span>
-  </div>
+    <div class="sidebar">
+      <div class="admin-info">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </div>
 
-  <a href="dashboard.html" class="sidebar-link">
-    <img src="images/home.png" alt="Dashboard" class="icon">
-    <span>Dashboard</span>
-  </a>
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
 
-  <a href="registered.html" class="sidebar-link">
-    <img src="images/users.png" alt="Registered Accounts" class="icon">
-    <span>Registered Accounts</span>
-  </a>
+      <a href="registered.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Registered Accounts</span>
+      </a>
 
-  <a href="approval.html" class="sidebar-link">
-    <img src="images/approve.png" alt="Account Approval Panel" class="icon">
-    <span>Account Approval Panel</span>
-  </a>
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
 
-  <a href="login.html" class="sidebar-link logout-link">
-    <img src="images/logout-ic.png" alt="Logout" class="icon">
-    <span>Logout</span>
-  </a>
+      <a href="login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
     </div>
 
     <!-- Main Content -->
     <div class="content">
-      <h2>Dashboard</h2>
+      <h1>Dashboard</h1>
 
       <!-- Profile Info -->
       <div class="profile-box">
@@ -50,21 +50,20 @@
       <div class="stats">
         <div class="card blue">
           <h3>Registered Experts</h3>
-          <p class="number">15</p>
+          <p class="number" id="registeredCount">0</p>
         </div>
         <div class="card blue">
           <h3>Pending Approvals</h3>
-          <p class="number">3</p>
+          <p class="number" id="pendingCount">0</p>
         </div>
       </div>
 
       <!-- Chart Section -->
-        <div class="chart-card">
+      <div class="chart-card">
         <h3>New Registrations Over Time</h3>
         <p class="growth">+15% <span class="sub">Last 30 Days • +15%</span></p>
         <canvas id="registrationsChart"></canvas>
-        </div>
-
+      </div>
 
       <!-- Bottom Buttons -->
       <div class="bottom-buttons">
@@ -74,31 +73,52 @@
     </div>
   </div>
 
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const ctx = document.getElementById('registrationsChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-      datasets: [{
-        label: 'Registrations',
-        data: [30, 50, 40, 60, 90, 80, 70],
-        borderColor: '#3b82f6',
-        borderWidth: 2,
-        fill: false,
-        tension: 0.4
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { display: false },
-        x: { grid: { display: false } }
-      }
+
+  <!-- Firebase Firestore Integration -->
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    async function loadStats() {
+      const expertsRef = collection(db, "experts");
+
+      // Count all experts
+      const all = await getDocs(expertsRef);
+      document.getElementById("registeredCount").textContent = all.size;
+
+      // Count pending experts
+      const pending = await getDocs(query(expertsRef, where("status", "==", "pending")));
+      document.getElementById("pendingCount").textContent = pending.size;
     }
-  });
-</script>
+
+    loadStats();
+
+    // Chart.js Example
+    const ctx = document.getElementById('registrationsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+          label: 'Registrations',
+          data: [30, 50, 40, 60, 90, 80, 70],
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.4
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { display: false },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  </script>
 
 </body>
 </html>

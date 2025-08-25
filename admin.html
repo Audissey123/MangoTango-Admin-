@@ -5,13 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin</title>
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // TODO: replace with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load experts from Firestore
+    async function loadExperts() {
+      const expertsTable = document.querySelector(".approval-table tbody");
+      expertsTable.innerHTML = ""; // clear any sample rows
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "experts"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          expertsTable.innerHTML += `
+            <tr>
+              <td>${data.name}</td>
+              <td>${data.expertise}</td>
+              <td>${data.registrationDate}</td>
+              <td><span class="status ${data.status.toLowerCase()}">${data.status}</span></td>
+              <td>View Profile</td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error("Error loading experts: ", err);
+      }
+    }
+
+    // Run on page load
+    window.addEventListener("DOMContentLoaded", loadExperts);
+  </script>
 </head>
 <body>
   <!-- Top Navigation -->
   <nav class="navbar2">
     <div class="nav-title">
-    <h1>Expert Platform Admin</h1>
-  </div>
+      <h1>Expert Platform Admin</h1>
+    </div>
     <div class="nav-links2">
       <a href="#">Dashboard</a>
       <a href="#">Registered Accounts</a>
@@ -22,99 +69,41 @@
     </div>
   </nav>
 
-        <div class="content">
-            <h1>Registered Experts</h1>
-            <p class="subtitle">Manage all registered experts in the platform</p>
+  <div class="content">
+    <h1>Registered Experts</h1>
+    <p class="subtitle">Manage all registered experts in the platform</p>
 
-            <!-- Stats -->
-            <div class="stats">
-                <div class="card2">
-                <p>Total Experts</p>
-                <h2>150</h2>
-            </div>
-                <div class="card2">
-                <p>Approved Experts</p>
-                    <h2>120</h2>
-                </div>
-                <div class="card2">
-                    <p>Pending Approval</p>
-                <h2>30</h2>
-            </div>
-        </div>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="card2">
+        <p>Total Experts</p>
+        <h2 id="totalExperts">0</h2>
+      </div>
+      <div class="card2">
+        <p>Approved Experts</p>
+        <h2 id="approvedExperts">0</h2>
+      </div>
+      <div class="card2">
+        <p>Pending Approval</p>
+        <h2 id="pendingExperts">0</h2>
+      </div>
+    </div>
 
-            <h2 class="section-title">Approved Accounts</h2>
-            <table class="approval-table">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Expertise</th>
-                    <th>Registration Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mr. Sam Clark</td>
-                        <td>Pest Manager</td>
-                        <td>2024-07-20</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mr. Kurt Harris</td>
-                        <td>Pest Manager</td>
-                        <td>2024-07-22</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Ms. Ava Montana</td>
-                        <td>Pest Manager</td>
-                        <td>2024-07-25</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mrs. Olivia Carter</td>
-                        <td>financial Analysis</td>
-                        <td>2024-09-03</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mr. Ethan Carter</td>
-                        <td>Marketing Strategy</td>
-                        <td>2022-05-14</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mr. Ethan Carter</td>
-                        <td>Marketing Strategy</td>
-                        <td>2022-05-14</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mr. Ethan Carter</td>
-                        <td>Marketing Strategy</td>
-                        <td>2022-05-14</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                    <tr>
-                        <td>Mr. Ethan Carter</td>
-                        <td>Marketing Strategy</td>
-                        <td>2022-05-14</td>
-                        <td><span class="status approved">Approved</span></td>
-                        <td>View Profile</td>
-                    </tr>
-                </tbody>
-            </table>
-
-      
-    </form>
+    <h2 class="section-title">Approved Accounts</h2>
+    <table class="approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Expertise</th>
+          <th>Registration Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be loaded from Firestore -->
+      </tbody>
+    </table>
   </div>
 </body>
 </html>

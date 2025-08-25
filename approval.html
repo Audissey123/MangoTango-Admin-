@@ -5,38 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Approval</title>
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // TODO: Replace with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load experts from Firestore
+    async function loadExperts() {
+      const expertsTable = document.querySelector(".approval-table tbody");
+      expertsTable.innerHTML = ""; // clear static rows
+
+      let total = 0, approved = 0, pending = 0;
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "experts"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          total++;
+
+          if (data.status === "Approved") {
+            approved++;
+          } else if (data.status === "Pending") {
+            pending++;
+          }
+
+          expertsTable.innerHTML += `
+            <tr>
+              <td>${data.name}</td>
+              <td>${data.expertise}</td>
+              <td>${data.applicationDate}</td>
+              <td><span class="status ${data.status.toLowerCase()}">${data.status}</span></td>
+            </tr>
+          `;
+        });
+
+        // Update stats
+        document.getElementById("totalExperts").innerText = total;
+        document.getElementById("approvedExperts").innerText = approved;
+        document.getElementById("pendingExperts").innerText = pending;
+
+      } catch (err) {
+        console.error("Error loading experts: ", err);
+      }
+    }
+
+    // Run on page load
+    window.addEventListener("DOMContentLoaded", loadExperts);
+  </script>
 </head>
 <body>
   <div class="layout">
-            <!-- Sidebar -->
-        <div class="sidebar">
-        <div class="admin-info">
-            <img src="images/profile.png" alt="Profile" class="icon">
-            <span>Administration 1</span>
-        </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="admin-info">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </div>
 
-        <a href="dashboard.html" class="sidebar-link">
-            <img src="images/home.png" alt="Dashboard" class="icon">
-            <span>Dashboard</span>
-        </a>
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
 
-        <a href="registered.html" class="sidebar-link">
-            <img src="images/users.png" alt="Registered Accounts" class="icon">
-            <span>Registered Accounts</span>
-        </a>
+      <a href="registered.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Registered Accounts</span>
+      </a>
 
-        <a href="approval.html" class="sidebar-link">
-            <img src="images/approve.png" alt="Account Approval Panel" class="icon">
-            <span>Account Approval Panel</span>
-        </a>
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
 
-        <a href="login.html" class="sidebar-link logout-link">
-            <img src="images/logout-ic.png" alt="Logout" class="icon">
-            <span>Logout</span>
-        </a>
+      <a href="login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
     </div>
 
-   <div class="content">
+    <!-- Main Content -->
+    <div class="content">
       <h1>Account Approval</h1>
       <p class="subtitle">Review and manage new expert registrations.</p>
 
@@ -44,19 +107,19 @@
       <div class="stats">
         <div class="card">
           <p>Total Experts</p>
-          <h2>5</h2>
+          <h2 id="totalExperts">0</h2>
         </div>
         <div class="card">
           <p>Approved Experts</p>
-          <h2>5</h2>
+          <h2 id="approvedExperts">0</h2>
         </div>
         <div class="card">
           <p>Pending Experts</p>
-          <h2>3</h2>
+          <h2 id="pendingExperts">0</h2>
         </div>
       </div>
 
-        <!-- Approved Accounts Table -->
+      <!-- Approved Accounts Table -->
       <h3>Approved Accounts</h3>
       <table class="approval-table">
         <thead>
@@ -68,27 +131,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Mr. Sam Clark</td>
-            <td>Pest Manager</td>
-            <td>2024-07-20</td>
-            <td><span class="status approved">Approved</span></td>
-          </tr>
-          <tr>
-            <td>Mr. Kurt Harris</td>
-            <td>Pest Manager</td>
-            <td>2024-07-22</td>
-            <td><span class="status approved">Approved</span></td>
-          </tr>
-          <tr>
-            <td>Ms. Ava Montana</td>
-            <td>Pest Manager</td>
-            <td>2024-07-25</td>
-            <td><span class="status approved">Approved</span></td>
-          </tr>
+          <!-- Rows will load dynamically from Firestore -->
         </tbody>
       </table>
-    </div>
     </div>
   </div>
 </body>

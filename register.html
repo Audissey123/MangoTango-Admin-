@@ -19,35 +19,86 @@
     </div>
   </nav>
 
-
   <div class="container">
     <h2>Pending Expert Registrations</h2>
 
-    <form>
+    <form id="expert-form">
       <label class="fillup">First Name</label>
-      <input type="text" value="David Aaron" readonly>
+      <input type="text" id="firstName" readonly>
 
       <label class="fillup">Last Name</label>
-      <input type="text" value="Serad" readonly>
+      <input type="text" id="lastName" readonly>
 
       <label class="fillup">Email</label>
-      <input type="text" value="david.aaron.serad@gmail.com" readonly>
+      <input type="text" id="email" readonly>
 
       <label class="fillup">Role/Expertise</label>
-      <input type="text" value="Agriculture Technician in Pest Management" readonly>
+      <input type="text" id="expertise" readonly>
 
       <label class="fillup">Department Address</label>
-      <input type="text" value="8WQW+JWG, DA-RFO7 Complex, Highway Maguikay, NS Cabahug St." readonly>
+      <input type="text" id="address" readonly>
       
       <div class="certificate-box">
-        <img src="images/certificate.png">
+        <img id="certificate" src="images/certificate.png">
       </div>
 
       <div class="buttons">
-        <button type="button" class="reject">Reject</button>
-        <button type="button" class="approve">Approve</button>
+        <button type="button" id="reject" class="reject">Reject</button>
+        <button type="button" id="approve" class="approve">Approve</button>
       </div>
     </form>
   </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 🔑 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Example: load 1 expert (doc ID = "expert1")
+    const expertId = "expert1"; // change this to the doc ID from Firestore
+    const expertRef = doc(db, "experts", expertId);
+
+    async function loadExpert() {
+      const snap = await getDoc(expertRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById("firstName").value = data.firstName;
+        document.getElementById("lastName").value = data.lastName;
+        document.getElementById("email").value = data.email;
+        document.getElementById("expertise").value = data.expertise;
+        document.getElementById("address").value = data.address;
+        if (data.certificateUrl) {
+          document.getElementById("certificate").src = data.certificateUrl;
+        }
+      }
+    }
+
+    // Approve
+    document.getElementById("approve").addEventListener("click", async () => {
+      await updateDoc(expertRef, { status: "approved" });
+      alert("Expert approved ✅");
+    });
+
+    // Reject
+    document.getElementById("reject").addEventListener("click", async () => {
+      await deleteDoc(expertRef);
+      alert("Expert rejected ❌");
+    });
+
+    loadExpert();
+  </script>
 </body>
 </html>
