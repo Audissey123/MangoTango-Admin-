@@ -6,12 +6,12 @@
   <title>Approval</title>
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Firebase SDK -->
+  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // TODO: Replace with your Firebase project config
+    
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -21,14 +21,14 @@
       appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
+    
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Load experts from Firestore
+    
     async function loadExperts() {
       const expertsTable = document.querySelector(".approval-table tbody");
-      expertsTable.innerHTML = ""; // clear static rows
+      expertsTable.innerHTML = "";
 
       let total = 0, approved = 0, pending = 0;
 
@@ -92,7 +92,7 @@
         <span>Account Approval Panel</span>
       </a>
 
-      <a href="login.html" class="sidebar-link logout-link">
+      <a href="admin-login.html" class="sidebar-link logout-link">
         <img src="images/logout-ic.png" alt="Logout" class="icon">
         <span>Logout</span>
       </a>

@@ -7,33 +7,32 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
+  <div class="reset-wrapper">
     <div class="reset-password-box">
-      <h2>Reset Password</h2>
-      
-      <label class="reset-label">
-        Enter your new password and confirm it to reset your
-        account's security credentials. Ensure your password
-        meets the security requirements.
-      </label>
+        <h2>Reset Password</h2>
+        
+        <label class="reset-label">
+            Enter your new password and confirm it to reset your
+            account's security credentials. Ensure your password
+            meets the security requirements.
+        </label>
 
-      <form id="resetForm">
-        <input type="password" id="newPassword" placeholder="New Password" required>
-        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        <form id="resetForm">
+            <input type="password" id="newPassword" placeholder="New Password" required>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
 
-        <div class="remember-me">
-          <label class="reset-label">
-            Password must be at least 8 characters long and include
-            a mix of uppercase, lowercase letters, numbers, and
-            symbols.
-          </label>
+            <div class="remember-me">
+            <label class="reset-label">
+                Password must be at least 8 characters long and include a mix of uppercase, lowercase letters, numbers, and symbols.
+            </label>
+            </div>
+
+            <button type="submit" class="submit-new">Submit New Password</button>
+            <a href="admin-login.html" class="remember">Remember your password? Login</a>
+        </form>
         </div>
-
-        <button type="submit" class="submit-new">Submit New Password</button>
-        <a href="admin-login.html" class="remember">Remember your password? Login</a>
-      </form>
-    </div>
-  </div>
+    <div>
+ 
 
   <script type="module">
     import { auth } from "./firebase-config.js";

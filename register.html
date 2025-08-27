@@ -10,43 +10,43 @@
   <!-- Top Navigation -->
   <nav class="navbar">
     <div class="nav-links">
-      <a href="#">Dashboard</a>
-      <a href="#">Registered Accounts</a>
-      <a href="#">Account Approval Panel</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="registered.html">Registered Accounts</a>
+      <a href="approval.html">Account Approval Panel</a>
     </div>
     <div class="profile-icon">
-      <img class="profile-icon img" src="images/profile.png">
+      <img src="images/profile.png" alt="Profile">
     </div>
   </nav>
 
   <div class="container">
-    <h2>Pending Expert Registrations</h2>
+      <h2>Pending Expert Registrations</h2>
 
-    <form id="expert-form">
-      <label class="fillup">First Name</label>
-      <input type="text" id="firstName" readonly>
+      <form id="expert-form">
+        <label>First Name</label>
+        <input type="text" id="firstName">
 
-      <label class="fillup">Last Name</label>
-      <input type="text" id="lastName" readonly>
+        <label>Last Name</label>
+        <input type="text" id="lastName">
 
-      <label class="fillup">Email</label>
-      <input type="text" id="email" readonly>
+        <label>Email</label>
+        <input type="text" id="email">
 
-      <label class="fillup">Role/Expertise</label>
-      <input type="text" id="expertise" readonly>
+        <label>Role/Expertise</label>
+        <input type="text" id="expertise">
 
-      <label class="fillup">Department Address</label>
-      <input type="text" id="address" readonly>
-      
-      <div class="certificate-box">
-        <img id="certificate" src="images/certificate.png">
-      </div>
+        <label>Department Address</label>
+        <input type="text" id="address">
 
-      <div class="buttons">
-        <button type="button" id="reject" class="reject">Reject</button>
-        <button type="button" id="approve" class="approve">Approve</button>
-      </div>
-    </form>
+        <div class="certificate-box">
+          <img id="certificate" src="images/certificate.png" alt="Certificate">
+
+        <div class="buttons">
+          <button type="button" id="reject" class="reject">Reject</button>
+          <button type="button" id="approve" class="approve">Approve</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Firebase Script -->
@@ -75,24 +75,31 @@
       const snap = await getDoc(expertRef);
       if (snap.exists()) {
         const data = snap.data();
-        document.getElementById("firstName").value = data.firstName;
-        document.getElementById("lastName").value = data.lastName;
-        document.getElementById("email").value = data.email;
-        document.getElementById("expertise").value = data.expertise;
-        document.getElementById("address").value = data.address;
+        document.getElementById("firstName").value = data.firstName || "";
+        document.getElementById("lastName").value = data.lastName || "";
+        document.getElementById("email").value = data.email || "";
+        document.getElementById("expertise").value = data.expertise || "";
+        document.getElementById("address").value = data.address || "";
         if (data.certificateUrl) {
           document.getElementById("certificate").src = data.certificateUrl;
         }
       }
     }
 
-    // Approve
+    // Approve (update Firestore with edited values)
     document.getElementById("approve").addEventListener("click", async () => {
-      await updateDoc(expertRef, { status: "approved" });
+      await updateDoc(expertRef, {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        email: document.getElementById("email").value,
+        expertise: document.getElementById("expertise").value,
+        address: document.getElementById("address").value,
+        status: "approved"
+      });
       alert("Expert approved ✅");
     });
 
-    // Reject
+    // Reject (delete from Firestore)
     document.getElementById("reject").addEventListener("click", async () => {
       await deleteDoc(expertRef);
       alert("Expert rejected ❌");

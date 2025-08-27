@@ -30,11 +30,11 @@
         <span>Account Approval Panel</span>
       </a>
 
-      <a href="login.html" class="sidebar-link logout-link">
+      <a href="admin-login.html" class="sidebar-link logout-link">
         <img src="images/logout-ic.png" alt="Logout" class="icon">
         <span>Logout</span>
       </a>
-  </div>
+    </div>
 
     <!-- Main Content -->
     <div class="content">
@@ -45,15 +45,15 @@
       <div class="stats">
         <div class="card">
           <h3>Pending Approvals</h3>
-          <p class="number">3</p>
+          <p id="pending-count" class="number">0</p>
         </div>
         <div class="card">
           <h3>New Applications Today</h3>
-          <p class="number">1</p>
+          <p id="new-today" class="number">0</p>
         </div>
         <div class="card">
           <h3>Total Experts</h3>
-          <p class="number">10</p>
+          <p id="total-experts" class="number">0</p>
         </div>
       </div>
 
@@ -69,29 +69,71 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Mr. Sophia Clark</td>
-              <td>Pest Manager</td>
-              <td>2024-07-20</td>
-              <td><a href="pending.html" class="view-link">View Registration</a></td>
-            </tr>
-            <tr>
-              <td>Mr. Noah Harris</td>
-              <td>Pest Manager</td>
-              <td>2024-07-22</td>
-              <td><a href="pending.html" class="view-link">View Registration</a></td>
-            </tr>
-            <tr>
-              <td>Ms. Ava Morgan</td>
-              <td>Pest Manager</td>
-              <td>2024-07-25</td>
-              <td><a href="pending.html" class="view-link">View Registration</a></td>
-            </tr>
+          <tbody id="pending-table-body">
+            <!-- Firebase data will be injected here -->
           </tbody>
         </table>
       </div>
     </div>
   </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 🔑 Your Firebase config (replace with your actual config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadExperts() {
+      const tableBody = document.getElementById("pending-table-body");
+      tableBody.innerHTML = ""; // clear existing rows
+
+      const querySnapshot = await getDocs(collection(db, "experts"));
+      let pendingCount = 0;
+      let totalExperts = 0;
+      let newToday = 0;
+
+      const today = new Date().toISOString().split("T")[0];
+
+      querySnapshot.forEach((doc) => {
+        const expert = doc.data();
+        totalExperts++;
+
+        if (expert.status === "pending") {
+          pendingCount++;
+          if (expert.applicationDate === today) {
+            newToday++;
+          }
+
+          const row = `
+            <tr>
+              <td>${expert.firstName} ${expert.lastName}</td>
+              <td>${expert.expertise}</td>
+              <td>${expert.applicationDate}</td>
+              <td><a href="pending.html?id=${doc.id}" class="view-link">View Registration</a></td>
+            </tr>
+          `;
+          tableBody.innerHTML += row;
+        }
+      });
+
+      document.getElementById("pending-count").textContent = pendingCount;
+      document.getElementById("new-today").textContent = newToday;
+      document.getElementById("total-experts").textContent = totalExperts;
+    }
+
+    loadExperts();
+  </script>
 </body>
 </html>
