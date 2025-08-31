@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <div class="container">
+    <div class="login-box">
+      <img src="images/mango.png" class="Logo">
+      <h2>Welcome back Admin</h2>
+      <form id="loginForm">
+        <label class="fillup">Email</label>
+        <input type="email" id="email" placeholder="Email" required>
+
+        <label class="fillup">Password</label>
+        <input type="password" id="password" placeholder="Password" required>
+
+        <div class="remember-me">
+          <input type="checkbox" id="remember">
+          <label for="remember">Remember me</label>
+        </div>
+
+        <button class="submit" type="submit">Log in</button>
+        <a href="forgot.html" class="forgot">Forgot password?</a>
+      </form>
+
+      <!-- ✅ Admin login logic here -->
+      <script type="module">
+        import { auth } from "./firebase-config.js";
+        import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const ADMIN_EMAIL = "admin1@gmail.com"; // 🔑 change this to your real admin email
+
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            if (user.email === ADMIN_EMAIL) {
+              alert("Welcome Admin!");
+              window.location.href = "dashboard.html"; // ✅ redirect to admin dashboard
+            } else {
+              alert("Access denied: You are not an admin.");
+              await auth.signOut(); // log out non-admins
+            }
+          } catch (err) {
+            alert("Error: " + err.message);
+          }
+        });
+      </script>
+    </div>
+  </div>
+</body>
+</html>

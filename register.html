@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="Admin.html">Registered Accounts</a>
+      <a href="approval.html">Account Approval Panel</a>
+    </div>
+    <div class="profile-icon">
+      <img src="images/profile.png" alt="Profile">
+    </div>
+  </nav>
+
+  <div class="container">
+      <h2>Expert Registration</h2>
+
+      <form id="expert-form">
+        <label>First Name</label>
+        <input type="text" id="firstName" required>
+
+        <label>Last Name</label>
+        <input type="text" id="lastName" required>
+
+        <label>Email</label>
+        <input type="email" id="email" required>
+
+        <label>Role/Expertise</label>
+        <input type="text" id="expertise" required>
+
+        <label>Department Address</label>
+        <input type="text" id="address" required>
+
+        <!-- ✅ Certificate Upload inside box -->
+        <label>Upload Certificate</label>
+        <div class="certificate-box" onclick="document.getElementById('certificateFile').click()">
+          <input type="file" id="certificateFile" accept=".jpg,.jpeg,.png,.pdf" style="display:none">
+          <img id="certificatePreview" src="images/certificate.png" alt="Certificate">
+          <p id="fileName" style="text-align:center; font-size:14px; margin-top:5px;"></p>
+        </div>
+
+        <div class="buttons">
+          <button type="button" id="submitBtn" class="approve">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
+
+    // 🔑 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Preview uploaded certificate
+    document.getElementById("certificateFile").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const preview = document.getElementById("certificatePreview");
+      const fileName = document.getElementById("fileName");
+
+      if (file) {
+        if (file.type.startsWith("image/")) {
+          preview.src = URL.createObjectURL(file);
+          fileName.textContent = "";
+        } else {
+          preview.src = "images/certificate.png"; // keep default image for PDFs
+          fileName.textContent = file.name;
+        }
+      }
+    });
+
+    // Submit button
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      try {
+        const firstName = document.getElementById("firstName").value;
+        const lastName = document.getElementById("lastName").value;
+        const email = document.getElementById("email").value;
+        const expertise = document.getElementById("expertise").value;
+        const address = document.getElementById("address").value;
+        let certURL = "";
+
+        const certFile = document.getElementById("certificateFile").files[0];
+        if (certFile) {
+          const certRef = ref(storage, "certificates/" + Date.now() + "_" + certFile.name);
+          await uploadBytes(certRef, certFile);
+          certURL = await getDownloadURL(certRef);
+        }
+
+        await addDoc(collection(db, "experts"), {
+          firstName,
+          lastName,
+          email,
+          expertise,
+          address,
+          certificateUrl: certURL,
+          status: "pending", // 👈 still pending
+          registrationDate: new Date().toLocaleDateString(),
+          createdAt: serverTimestamp()
+        });
+
+        alert("Expert submitted successfully ✅ Waiting for admin approval.");
+        document.getElementById("expert-form").reset();
+        document.getElementById("certificatePreview").src = "images/certificate.png";
+        document.getElementById("fileName").textContent = "";
+      } catch (error) {
+        console.error("Error submitting expert: ", error);
+        alert("Error submitting expert ❌");
+      }
+    });
+  </script>
+</body>
+</html>

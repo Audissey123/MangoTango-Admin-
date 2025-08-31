@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Accounts</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="admin-info">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </div>
+
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
+
+      <a href="pending.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Pending Accounts</span>
+      </a>
+
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
+
+      <a href="admin-login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <h1>Technician Accounts</h1>
+      <p>Review and manage new technician registrations.</p>
+
+      <!-- Stats Cards -->
+      <div class="stats">
+        <div class="card">
+          <h3>Pending Accounts</h3>
+          <p id="pending-count" class="number">0</p>
+        </div>
+        <div class="card">
+          <h3>New Applications Today</h3>
+          <p id="new-today" class="number">0</p>
+        </div>
+        <div class="card">
+          <h3>Registered Technicians</h3>
+          <p id="registered-count" class="number">0</p>
+        </div>
+      </div>
+
+      <!-- Pending Accounts Table -->
+      <h3>Pending Accounts</h3>
+      <div class="pending-accounts">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Expertise</th>
+              <th>Application Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pending-table-body">
+            <!-- Firebase data will be injected here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 🔑 Your Firebase config (replace with your actual config)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadExperts() {
+      const tableBody = document.getElementById("pending-table-body");
+      tableBody.innerHTML = ""; // clear existing rows
+
+      const querySnapshot = await getDocs(collection(db, "experts"));
+      let pendingCount = 0;
+      let registeredCount = 0;
+      let newToday = 0;
+
+      const today = new Date().toISOString().split("T")[0];
+
+      querySnapshot.forEach((doc) => {
+        const expert = doc.data();
+
+        if (expert.status === "pending") {
+          pendingCount++;
+          if (expert.applicationDate === today) {
+            newToday++;
+          }
+
+          const row = `
+            <tr>
+              <td>${expert.firstName} ${expert.lastName}</td>
+              <td>${expert.expertise}</td>
+              <td>${expert.applicationDate}</td>
+              <td><a href="pending.html?id=${doc.id}" class="view-link">View Registration</a></td>
+            </tr>
+          `;
+          tableBody.innerHTML += row;
+        }
+
+        if (expert.status === "approved") {
+          registeredCount++;
+        }
+      });
+
+      document.getElementById("pending-count").textContent = pendingCount;
+      document.getElementById("new-today").textContent = newToday;
+      document.getElementById("registered-count").textContent = registeredCount;
+    }
+
+    loadExperts();
+  </script>
+</body>
+</html>

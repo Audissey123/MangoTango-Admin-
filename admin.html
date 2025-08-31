@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // 🔑 Replace with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Load experts from Firestore
+    async function loadExperts() {
+      const expertsTable = document.querySelector(".approval-table tbody");
+      expertsTable.innerHTML = ""; // clear any rows
+
+      let total = 0;
+      let approved = 0;
+      let pending = 0;
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "experts"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          total++;
+
+          if (data.status === "approved") {
+            approved++;
+          } else {
+            pending++;
+          }
+
+          expertsTable.innerHTML += `
+            <tr>
+              <td>${data.firstName || ""} ${data.lastName || ""}</td>
+              <td>${data.expertise || ""}</td>
+              <td>${data.registrationDate || "N/A"}</td>
+              <td><span class="status ${data.status ? data.status.toLowerCase() : ""}">${data.status || "pending"}</span></td>
+              <td><button onclick="viewProfile('${doc.id}')">View Profile</button></td>
+            </tr>
+          `;
+        });
+
+        // Update stats
+        document.getElementById("totalExperts").textContent = total;
+        document.getElementById("approvedExperts").textContent = approved;
+        document.getElementById("pendingExperts").textContent = pending;
+      } catch (err) {
+        console.error("Error loading experts: ", err);
+      }
+    }
+
+    // View profile function (can redirect later)
+    window.viewProfile = function (id) {
+      alert("View profile of expert with ID: " + id);
+    };
+
+    // Run on page load
+    window.addEventListener("DOMContentLoaded", loadExperts);
+  </script>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <nav class="navbar2">
+    <div class="nav-title">
+      <h1>Technician Platform Admin</h1>
+    </div>
+    <div class="nav-links2">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="Admin.html">Technicians</a>
+      <a href="#">Client</a>
+      <a href="#">Reports</a>
+    </div>
+    <div class="profile-icon">
+      <img class="profile-icon img" src="images/profile.png">
+    </div>
+  </nav>
+
+  <div class="content">
+    <h1>Registered Technician</h1>
+    <p class="subtitle">Manage all registered technicians in the platform</p>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="card2">
+        <p>Total Technician</p>
+        <h2 id="totalExperts">0</h2>
+      </div>
+      <div class="card2">
+        <p>Approved Technician</p>
+        <h2 id="approvedExperts">0</h2>
+      </div>
+      <div class="card2">
+        <p>Pending Approval</p>
+        <h2 id="pendingExperts">0</h2>
+      </div>
+    </div>
+
+    <h2 class="section-title">Approved Accounts</h2>
+    <table class="approval-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Expertise</th>
+          <th>Registration Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be loaded from Firestore -->
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
