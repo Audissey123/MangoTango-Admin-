@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registered Accounts</title>
+  <title>Pending Accounts</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,9 +20,9 @@
         <span>Dashboard</span>
       </a>
 
-      <a href="registered.html" class="sidebar-link">
+      <a href="pending.html" class="sidebar-link">
         <img src="images/users.png" alt="Registered Accounts" class="icon">
-        <span>Registered Accounts</span>
+        <span>Pending Accounts</span>
       </a>
 
       <a href="approval.html" class="sidebar-link">
@@ -38,13 +38,13 @@
 
     <!-- Main Content -->
     <div class="content">
-      <h1>Expert Accounts</h1>
-      <p>Review and manage new expert registrations.</p>
+      <h1>Technician Accounts</h1>
+      <p>Review and manage new technician registrations.</p>
 
       <!-- Stats Cards -->
       <div class="stats">
         <div class="card">
-          <h3>Pending Approvals</h3>
+          <h3>Pending Accounts</h3>
           <p id="pending-count" class="number">0</p>
         </div>
         <div class="card">
@@ -52,8 +52,8 @@
           <p id="new-today" class="number">0</p>
         </div>
         <div class="card">
-          <h3>Total Experts</h3>
-          <p id="total-experts" class="number">0</p>
+          <h3>Registered Technicians</h3>
+          <p id="registered-count" class="number">0</p>
         </div>
       </div>
 
@@ -101,14 +101,13 @@
 
       const querySnapshot = await getDocs(collection(db, "experts"));
       let pendingCount = 0;
-      let totalExperts = 0;
+      let registeredCount = 0;
       let newToday = 0;
 
       const today = new Date().toISOString().split("T")[0];
 
       querySnapshot.forEach((doc) => {
         const expert = doc.data();
-        totalExperts++;
 
         if (expert.status === "pending") {
           pendingCount++;
@@ -126,11 +125,15 @@
           `;
           tableBody.innerHTML += row;
         }
+
+        if (expert.status === "approved") {
+          registeredCount++;
+        }
       });
 
       document.getElementById("pending-count").textContent = pendingCount;
       document.getElementById("new-today").textContent = newToday;
-      document.getElementById("total-experts").textContent = totalExperts;
+      document.getElementById("registered-count").textContent = registeredCount;
     }
 
     loadExperts();

@@ -20,9 +20,9 @@
         <span>Dashboard</span>
       </a>
 
-      <a href="registered.html" class="sidebar-link">
+      <a href="pending.html" class="sidebar-link">
         <img src="images/users.png" alt="Registered Accounts" class="icon">
-        <span>Registered Accounts</span>
+        <span>Pending Accounts</span>
       </a>
 
       <a href="approval.html" class="sidebar-link">
@@ -48,27 +48,20 @@
 
       <!-- Stats -->
       <div class="stats">
-        <div class="card blue">
-          <h3>Registered Experts</h3>
-          <p class="number" id="registeredCount">0</p>
-        </div>
-        <div class="card blue">
-          <h3>Pending Approvals</h3>
-          <p class="number" id="pendingCount">0</p>
-        </div>
+        <a href="admin.html" class="card blue">
+            <h3>Registered Technician</h3>
+            <p class="number" id="registeredCount">0</p>
+        </a>
+        <a href="approval.html" class="card blue">
+            <h3>Pending Approvals</h3>
+            <p class="number" id="pendingCount">0</p>
+        </a>
       </div>
 
       <!-- Chart Section -->
       <div class="chart-card">
         <h3>New Registrations Over Time</h3>
-        <p class="growth">+15% <span class="sub">Last 30 Days • +15%</span></p>
         <canvas id="registrationsChart"></canvas>
-      </div>
-
-      <!-- Bottom Buttons -->
-      <div class="bottom-buttons">
-        <a href="registered.html" class="btn">Registered Accounts</a>
-        <a href="approval.html" class="btn">Account Approval Panel</a>
       </div>
     </div>
   </div>
@@ -91,33 +84,51 @@
       // Count pending experts
       const pending = await getDocs(query(expertsRef, where("status", "==", "pending")));
       document.getElementById("pendingCount").textContent = pending.size;
+
+      // Process registration dates for chart
+      const monthCounts = {};
+      all.forEach(doc => {
+        const data = doc.data();
+        if (data.createdAt) {
+          const date = data.createdAt.toDate(); // Firestore Timestamp
+          const month = date.toLocaleString("default", { month: "short" });
+          monthCounts[month] = (monthCounts[month] || 0) + 1;
+        }
+      });
+
+      // Prepare chart data
+      const labels = Object.keys(monthCounts);
+      const dataPoints = Object.values(monthCounts);
+
+      renderChart(labels, dataPoints);
+    }
+
+    function renderChart(labels, dataPoints) {
+      const ctx = document.getElementById('registrationsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Registrations',
+            data: dataPoints,
+            borderColor: '#3b82f6',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4
+          }]
+        },
+        options: {
+          plugins: { legend: { display: true } },
+          scales: {
+            y: { beginAtZero: true },
+            x: { grid: { display: false } }
+          }
+        }
+      });
     }
 
     loadStats();
-
-    // Chart.js Example
-    const ctx = document.getElementById('registrationsChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-        datasets: [{
-          label: 'Registrations',
-          data: [30, 50, 40, 60, 90, 80, 70],
-          borderColor: '#3b82f6',
-          borderWidth: 2,
-          fill: false,
-          tension: 0.4
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { display: false },
-          x: { grid: { display: false } }
-        }
-      }
-    });
   </script>
 
 </body>
