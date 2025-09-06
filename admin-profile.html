@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="nav-title">
+      <h1>Admin Profile</h1>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="pending.html">Registered Accounts</a>
+      <a href="approval.html">Approval Panel</a>
+      <a href="admin-login.html">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <div class="profile-card">
+      <div class="profile-header">
+        <img src="images/profile.png" alt="Admin Photo" class="profile-pic">
+        <h2 id="adminName">Loading...</h2>
+        <p class="role" id="adminRole">Loading...</p>
+      </div>
+      
+      <div class="profile-info">
+        <h3>Personal Information</h3>
+        <p><strong>Email:</strong> <span id="adminEmail">Loading...</span></p>
+        <p><strong>Phone:</strong> <span id="adminPhone">Loading...</span></p>
+        <p><strong>Address:</strong> <span id="adminAddress">Loading...</span></p>
+      </div>
+
+      <div class="profile-info">
+        <h3>Account Details</h3>
+        <p><strong>Username:</strong> <span id="adminUsername">Loading...</span></p>
+        <p><strong>Role:</strong> <span id="adminRole2">Loading...</span></p>
+        <p><strong>Joined:</strong> <span id="adminJoined">Loading...</span></p>
+      </div>
+
+      <div class="profile-actions">
+        <button id="editBtn" class="approve">Edit Profile</button>
+        <button id="saveBtn" class="approve" style="display:none;">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Firestore + Auth -->
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // DOM Elements
+    const fields = {
+      name: document.getElementById("adminName"),
+      role: document.getElementById("adminRole"),
+      email: document.getElementById("adminEmail"),
+      phone: document.getElementById("adminPhone"),
+      address: document.getElementById("adminAddress"),
+      username: document.getElementById("adminUsername"),
+      role2: document.getElementById("adminRole2"),
+      joined: document.getElementById("adminJoined"),
+    };
+
+    const editBtn = document.getElementById("editBtn");
+    const saveBtn = document.getElementById("saveBtn");
+
+    let adminRef = null;
+
+    // Load profile data
+    async function loadProfile() {
+      if (!adminRef) return;
+      const snapshot = await getDoc(adminRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        fields.name.textContent = data.name || "Not set";
+        fields.role.textContent = data.role || "Not set";
+        fields.email.textContent = data.email || "Not set";
+        fields.phone.textContent = data.phone || "Not set";
+        fields.address.textContent = data.address || "Not set";
+        fields.username.textContent = data.username || "Not set";
+        fields.role2.textContent = data.role || "Not set";
+        fields.joined.textContent = data.joined || "Not set";
+      }
+    }
+
+    // Make fields editable
+    function makeEditable() {
+      Object.values(fields).forEach(el => {
+        const text = el.textContent;
+        el.innerHTML = `<input type="text" value="${text}">`;
+      });
+      editBtn.style.display = "none";
+      saveBtn.style.display = "inline-block";
+    }
+
+    // Save changes to Firestore
+    async function saveProfile() {
+      const updatedData = {
+        name: fields.name.querySelector("input").value,
+        role: fields.role.querySelector("input").value,
+        email: fields.email.querySelector("input").value,
+        phone: fields.phone.querySelector("input").value,
+        address: fields.address.querySelector("input").value,
+        username: fields.username.querySelector("input").value,
+        joined: fields.joined.querySelector("input").value,
+      };
+
+      await updateDoc(adminRef, updatedData);
+      alert("Profile updated!");
+
+      // Reload updated profile
+      loadProfile();
+      editBtn.style.display = "inline-block";
+      saveBtn.style.display = "none";
+    }
+
+    // Listen for logged-in user
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        adminRef = doc(db, "admins", user.uid);
+        loadProfile();
+      } else {
+        window.location.href = "admin-login.html"; // redirect if not logged in
+      }
+    });
+
+    // Events
+    editBtn.addEventListener("click", makeEditable);
+    saveBtn.addEventListener("click", saveProfile);
+  </script>
+</body>
+</html>

@@ -87,25 +87,26 @@ input[type="email"] {
   cursor: pointer;
 }
 
-.submit{
-  width: 100%;                /* takes full width of container */
+.submit {
+  width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #3498DB;
   color: #fff;
   font-size: 15px;
   font-weight: bold;
   border: none;
-  border-radius: 30px;         /* rounded */
+  border-radius: 30px;
   margin-top: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #3498DB;
-  width: 100%;
 }
 
-submit:hover {
-  background: #2563eb;
+/* Hover effect */
+.submit:hover {
+  background-color: #5dade2; /* lighter blue */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
+
 
 /* Forgot password link below the button */
 .forgot {
@@ -191,9 +192,9 @@ submit:hover {
     gap: 20px;
   }
 
-  .navbar .nav-links a {
+.navbar .nav-links a {
   color: #ecf0f1;
-  text-decoration: none;
+  text-decoration: underline;
   font-weight: 500;
   transition: color 0.3s;
 }
@@ -216,7 +217,7 @@ submit:hover {
   margin: 0;
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: #bbbbbb;
   margin-right: 700px;
 }
 
@@ -347,63 +348,91 @@ form input {
     min-height: 100vh;
   }
 
-  .sidebar {
-    width: 220px;
-    background: #f8f9fa;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Sidebar profile (Admin info) */
-  .admin-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px; 
-  }
-
-  .admin-info img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%; 
-    object-fit: cover;  
-    border: 2px solid #ccc;
-  }
-
-  .icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;   /* makes icons round */
-  object-fit: cover;    /* keeps images from stretching */
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #2C3E50, #34495E); /* sleek gradient */
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  border-right: none;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
+/* Admin info */
+.admin-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px; 
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: #f1f1f1; /* lighter text for visibility */
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.admin-info span {
+  color: #ecf0f1;       /* brighter white */
+  font-weight: 600;     /* make name stand out */
+  letter-spacing: 0.5px;
+}
+
+.admin-info img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%; 
+  object-fit: cover;  
+  border: 2px solid #fff;
+  filter: none; /* prevent it from turning white */
+}
+
+/* Sidebar links */
 .sidebar-link {
-  color: #2C3E50;
+  color: #ecf0f1;
   text-decoration: none;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 15px;
-  border-radius: 25px;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin: 5px 0;
   transition: all 0.3s ease;
 }
 
 .sidebar-link:hover {
-  background: #3498DB;
-  color: white;
+  background: rgba(255,255,255,0.12);
+  transform: translateX(5px);
 }
 
+/* Active link */
 .sidebar-link.active {
-  background: #2C3E50;
-  color: white;
+  background: #3498DB;
+  color: #fff;
+  font-weight: 600;
 }
 
 .sidebar-link.active .icon {
-  filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1); /* make icons white when active */
 }
+
+/* Sidebar icons */
+.icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* force icons to be visible on dark bg */
+  opacity: 0.9;
+}
+
+.sidebar-link:hover .icon {
+  opacity: 1; /* brighten icons on hover */
+}
+
 
   /* Main Content */
   .content {
@@ -583,6 +612,61 @@ form input {
 .status.pending {
   background: #ff9800;
   color: #fff;
+}
+
+/* Profile Page */
+.profile-card {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.profile-header {
+  margin-bottom: 20px;
+}
+
+.profile-header h2 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-size: 22px;
+  color: #2C3E50;
+}
+
+.profile-header .role {
+  color: #777;
+  font-size: 14px;
+}
+
+.profile-info {
+  text-align: left;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.profile-info h3 {
+  margin-bottom: 10px;
+  color: #2C3E50;
+  font-size: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.profile-info p {
+  margin: 6px 0;
+  color: #333;
+}
+
+.profile-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
 
 
