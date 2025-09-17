@@ -3,50 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login</title>
+  <title>MangoTango - Admin Login</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="login-page">
   <div class="container">
     <div class="login-box">
-      <img src="images/mango.png" class= "Logo">
-      <h2>Welcome back Admin</h2>
+      <img src="images/mango.png" class="Logo" alt="MangoTango Logo">
+      <h2>Welcome back, Admin</h2>
+
+      <!-- Login Form -->
       <form id="loginForm">
-  <label class="fillup">Email</label>
-  <input type="email" id="email" placeholder="Email" required>
+        <label class="fillup" for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
 
-  <label class="fillup">Password</label>
-  <input type="password" id="password" placeholder="Password" required>
+        <label class="fillup" for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
 
-  <div class="remember-me">
-    <input type="checkbox" id="remember">
-    <label for="remember">Remember me</label>
-  </div>
+        <div class="remember-me">
+          <input type="checkbox" id="remember">
+          <label for="remember">Remember me</label>
+        </div>
 
-  <button class="submit" type="submit">Log in</button>
-  <a href="forgot.html" class="forgot">Forgot password?</a>
-</form>
-
-<script type="module">
-import { auth } from "./firebase-config.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    alert("Login successful!");
-    window.location.href = "dashboard.html"; // redirect
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-});
-</script>
-   
+        <button class="submit" type="submit">Log in</button>
+        <a href="forgot.html" class="forgot">Forgot password?</a>
+      </form>
     </div>
   </div>
+
+  <!-- Firebase Auth Script -->
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+        window.location.href = "dashboard.html"; // redirect after login
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+  </script>
 </body>
 </html>

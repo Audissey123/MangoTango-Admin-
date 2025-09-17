@@ -9,33 +9,32 @@
 <body>
   <div class="layout">
     <!-- Sidebar -->
-<div class="sidebar">
-  <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
-    <img src="images/profile.png" alt="Profile" class="icon">
-    <span>Administration 1</span>
-  </a>
+    <div class="sidebar">
+      <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </a>
 
-  <a href="dashboard.html" class="sidebar-link">
-    <img src="images/home.png" alt="Dashboard" class="icon">
-    <span>Dashboard</span>
-  </a>
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
 
-  <a href="pending.html" class="sidebar-link">
-    <img src="images/users.png" alt="Registered Accounts" class="icon">
-    <span>Pending Accounts</span>
-  </a>
+      <a href="pending.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Pending Accounts</span>
+      </a>
 
-  <a href="approval.html" class="sidebar-link">
-    <img src="images/approve.png" alt="Account Approval Panel" class="icon">
-    <span>Account Approval Panel</span>
-  </a>
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
 
-  <a href="admin-login.html" class="sidebar-link logout-link">
-    <img src="images/logout-ic.png" alt="Logout" class="icon">
-    <span>Logout</span>
-  </a>
-</div>
-
+      <a href="admin-login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
+    </div>
 
     <!-- Main Content -->
     <div class="content">
@@ -78,56 +77,56 @@
     </div>
   </div>
 
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { db, auth } from "./firebase-config.js";
+    import { collection, getDocs } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    // 🔑 Your Firebase config (replace with your actual config)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+    // ✅ Protect route
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "admin-login.html";
+      }
+    });
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // ✅ Logout button
+    document.querySelector(".logout-link").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = "admin-login.html";
+    });
 
     async function loadExperts() {
       const tableBody = document.getElementById("pending-table-body");
-      tableBody.innerHTML = ""; // clear existing rows
+      tableBody.innerHTML = "";
 
-      const querySnapshot = await getDocs(collection(db, "experts"));
-      let pendingCount = 0;
-      let registeredCount = 0;
-      let newToday = 0;
-
+      let pendingCount = 0, registeredCount = 0, newToday = 0;
       const today = new Date().toISOString().split("T")[0];
 
-      querySnapshot.forEach((doc) => {
+      const snapshot = await getDocs(collection(db, "experts"));
+      snapshot.forEach((doc) => {
         const expert = doc.data();
+        let status = (expert.status === "Approved") ? "Approved" : "Pending";
 
-        if (expert.status === "pending") {
+        if (status === "Pending") {
           pendingCount++;
-          if (expert.applicationDate === today) {
+          if (expert.registrationDate === today) {
             newToday++;
           }
 
-          const row = `
+          tableBody.innerHTML += `
             <tr>
-              <td>${expert.firstName} ${expert.lastName}</td>
-              <td>${expert.expertise}</td>
-              <td>${expert.applicationDate}</td>
+              <td>${expert.firstName || ""} ${expert.lastName || ""}</td>
+              <td>${expert.expertise || ""}</td>
+              <td>${expert.registrationDate || "N/A"}</td>
               <td><a href="pending.html?id=${doc.id}" class="view-link">View Registration</a></td>
             </tr>
           `;
-          tableBody.innerHTML += row;
         }
 
-        if (expert.status === "approved") {
+        if (status === "Approved") {
           registeredCount++;
         }
       });
@@ -137,7 +136,7 @@
       document.getElementById("registered-count").textContent = registeredCount;
     }
 
-    loadExperts();
+    window.addEventListener("DOMContentLoaded", loadExperts);
   </script>
 </body>
 </html>

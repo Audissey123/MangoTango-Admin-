@@ -5,123 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Approval</title>
   <link rel="stylesheet" href="styles.css">
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { 
-      getFirestore, collection, getDocs, doc, updateDoc 
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    // Firebase config (replace with your own)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    // Init
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Load experts into the table
-    async function loadExperts() {
-      const expertsTable = document.querySelector(".approval-table tbody");
-      expertsTable.innerHTML = "";
-
-      let approved = 0, pending = 0;
-
-      try {
-        const querySnapshot = await getDocs(collection(db, "experts"));
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-
-          if (data.status === "Approved") {
-            approved++;
-          } else if (data.status === "Pending") {
-            pending++;
-          }
-
-          expertsTable.innerHTML += `
-            <tr>
-              <td>${data.name || "-"}</td>
-              <td>${data.expertise || "-"}</td>
-              <td>${data.applicationDate || "-"}</td>
-              <td><span class="status ${data.status?.toLowerCase()}">${data.status}</span></td>
-              <td>
-                ${data.status === "Pending" ? `
-                  <button class="approve-btn" data-id="${docSnap.id}">Approve</button>
-                  <button class="reject-btn" data-id="${docSnap.id}">Reject</button>
-                ` : ""}
-              </td>
-            </tr>
-          `;
-        });
-
-        // Update stats
-        document.getElementById("approvedExperts").innerText = approved;
-        document.getElementById("pendingExperts").innerText = pending;
-
-        // Attach events after rows are added
-        document.querySelectorAll(".approve-btn").forEach(btn => {
-          btn.addEventListener("click", () => updateStatus(btn.dataset.id, "Approved"));
-        });
-        document.querySelectorAll(".reject-btn").forEach(btn => {
-          btn.addEventListener("click", () => updateStatus(btn.dataset.id, "Rejected"));
-        });
-
-      } catch (err) {
-        console.error("Error loading experts: ", err);
-      }
-    }
-
-    // Update Firestore status
-    async function updateStatus(docId, newStatus) {
-      try {
-        await updateDoc(doc(db, "experts", docId), { status: newStatus });
-        alert(`User ${newStatus}`);
-        loadExperts(); // Refresh table
-      } catch (err) {
-        console.error("Error updating status:", err);
-      }
-    }
-
-    // Run on page load
-    window.addEventListener("DOMContentLoaded", loadExperts);
-  </script>
 </head>
 <body>
   <div class="layout">
     <!-- Sidebar -->
-<div class="sidebar">
-  <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
-    <img src="images/profile.png" alt="Profile" class="icon">
-    <span>Administration 1</span>
-  </a>
+    <div class="sidebar">
+      <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </a>
 
-  <a href="dashboard.html" class="sidebar-link">
-    <img src="images/home.png" alt="Dashboard" class="icon">
-    <span>Dashboard</span>
-  </a>
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
 
-  <a href="pending.html" class="sidebar-link">
-    <img src="images/users.png" alt="Registered Accounts" class="icon">
-    <span>Pending Accounts</span>
-  </a>
+      <a href="pending.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Pending Accounts</span>
+      </a>
 
-  <a href="approval.html" class="sidebar-link">
-    <img src="images/approve.png" alt="Account Approval Panel" class="icon">
-    <span>Account Approval Panel</span>
-  </a>
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
 
-  <a href="admin-login.html" class="sidebar-link logout-link">
-    <img src="images/logout-ic.png" alt="Logout" class="icon">
-    <span>Logout</span>
-  </a>
-</div>
-
+      <a href="admin-login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
+    </div>
 
     <!-- Main Content -->
     <div class="content">
@@ -158,5 +71,85 @@
       </table>
     </div>
   </div>
+
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import { collection, getDocs, doc, updateDoc } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // ✅ Protect route
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "admin-login.html";
+      }
+    });
+
+    // ✅ Logout button
+    document.querySelector(".logout-link").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.href = "admin-login.html";
+    });
+
+    async function loadExperts() {
+      const expertsTable = document.querySelector(".approval-table tbody");
+      expertsTable.innerHTML = "";
+
+      let approved = 0, pending = 0;
+
+      try {
+        const snapshot = await getDocs(collection(db, "experts"));
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          let status = (data.status === "Approved") ? "Approved" : "Pending";
+
+          if (status === "Approved") approved++;
+          if (status === "Pending") pending++;
+
+          expertsTable.innerHTML += `
+            <tr>
+              <td>${data.firstName || ""} ${data.lastName || ""}</td>
+              <td>${data.expertise || "-"}</td>
+              <td>${data.registrationDate || "-"}</td>
+              <td><span class="status ${status.toLowerCase()}">${status}</span></td>
+              <td>
+                ${status === "Pending" ? `
+                  <button class="approve-btn" data-id="${docSnap.id}">Approve</button>
+                  <button class="reject-btn" data-id="${docSnap.id}">Reject</button>
+                ` : ""}
+              </td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("approvedExperts").innerText = approved;
+        document.getElementById("pendingExperts").innerText = pending;
+
+        document.querySelectorAll(".approve-btn").forEach(btn => {
+          btn.addEventListener("click", () => updateStatus(btn.dataset.id, "Approved"));
+        });
+        document.querySelectorAll(".reject-btn").forEach(btn => {
+          btn.addEventListener("click", () => updateStatus(btn.dataset.id, "Pending"));
+        });
+
+      } catch (err) {
+        console.error("Error loading experts: ", err);
+      }
+    }
+
+    async function updateStatus(docId, newStatus) {
+      try {
+        await updateDoc(doc(db, "experts", docId), { status: newStatus });
+        alert(`User ${newStatus}`);
+        loadExperts();
+      } catch (err) {
+        console.error("Error updating status:", err);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", loadExperts);
+  </script>
 </body>
 </html>
