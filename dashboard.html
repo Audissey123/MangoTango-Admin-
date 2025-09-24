@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
 </head>
 <body>
   <div class="layout">
@@ -38,7 +41,18 @@
 
     <!-- Main Content -->
     <div class="content">
-      <h1>Dashboard</h1>
+      <div class="content-header">
+        <h1>Dashboard</h1>
+        <div class="notif-container">
+          <button class="notif-bell" aria-label="Notifications">🔔
+            <span class="notif-badge" hidden>0</span>
+          </button>
+          <div class="notif-panel" hidden>
+            <div class="notif-header">New registrations today</div>
+            <ul class="notif-list"></ul>
+          </div>
+        </div>
+      </div>
 
       <!-- Profile Info -->
       <div class="profile-box">
@@ -75,6 +89,7 @@
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { signOut, onAuthStateChanged } 
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { initNotifications } from "./notifications.js";
 
     // ✅ Protect route
     onAuthStateChanged(auth, (user) => {
@@ -87,15 +102,15 @@
     document.querySelector(".logout-link").addEventListener("click", async (e) => {
       e.preventDefault();
       await signOut(auth);
-      window.location.href = "admin-login.html";
+      window.location.replace("admin-login.html");
     });
 
     async function loadStats() {
       const expertsRef = collection(db, "experts");
 
-      // Count all experts
-      const all = await getDocs(expertsRef);
-      document.getElementById("registeredCount").textContent = all.size;
+      // Count approved experts (registered)
+      const approvedSnap = await getDocs(query(expertsRef, where("status", "==", "Approved")));
+      document.getElementById("registeredCount").textContent = approvedSnap.size;
 
       // Count pending experts
       const pending = await getDocs(query(expertsRef, where("status", "==", "Pending")));
@@ -103,11 +118,20 @@
 
       // Process registration dates for chart
       const monthCounts = {};
-      all.forEach(doc => {
+      const allForChart = await getDocs(expertsRef);
+      allForChart.forEach(doc => {
         const data = doc.data();
-        if (data.createdAt) {
-          const date = data.createdAt.toDate();
-          const month = date.toLocaleString("default", { month: "short" });
+        let dateObj = null;
+        if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+          dateObj = data.createdAt.toDate();
+        } else if (data.registrationDate) {
+          const parts = String(data.registrationDate).split('-');
+          if (parts.length === 3) {
+            dateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+          }
+        }
+        if (dateObj) {
+          const month = dateObj.toLocaleString("default", { month: "short" });
           monthCounts[month] = (monthCounts[month] || 0) + 1;
         }
       });
@@ -116,6 +140,8 @@
       const dataPoints = Object.values(monthCounts);
       renderChart(labels, dataPoints);
     }
+
+    // notifications handled by shared module
 
     function renderChart(labels, dataPoints) {
       const ctx = document.getElementById('registrationsChart').getContext('2d');
@@ -142,7 +168,16 @@
       });
     }
 
-    loadStats();
+    window.addEventListener('DOMContentLoaded', async () => {
+      await Promise.all([loadStats(), initNotifications(db)]);
+    });
+
+    // Block navigating back to this page after logout
+    window.addEventListener('popstate', () => {
+      if (!auth.currentUser) {
+        window.location.replace('admin-login.html');
+      }
+    });
   </script>
 </body>
 </html>

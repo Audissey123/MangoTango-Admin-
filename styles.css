@@ -1,7 +1,12 @@
+/* Global fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&family=Open+Sans:wght@400&display=swap');
+
+/* Root */
 html{
   height: 100%;
 }
 
+/* Base page styling */
 body {
   margin: 0;
   padding: 0;
@@ -11,6 +16,7 @@ body {
   height: 100%;
 }
 
+/* Login page layout */
 body.login-page {
   margin: 0;
   display: flex;
@@ -19,10 +25,12 @@ body.login-page {
   height: 100vh;
 }
 
+/* Auth box */
 .login-box{
   width: 400px;
 }
 
+/* Logo */
 .Logo {
   display: block;
   margin: 0 auto 20px;   /* centers image horizontally */
@@ -31,6 +39,7 @@ body.login-page {
 }
 
 
+/* Headings */
 h2 {
   margin: 0;
   padding: 0;
@@ -40,6 +49,7 @@ h2 {
   color: #2C3E50;
 }
 
+/* Forms */
 form {
   margin: 0;
   padding: 0;
@@ -48,6 +58,7 @@ form {
 }
 
 
+/* Form section labels */
 .fillup {
   text-align: left;
   margin-bottom: 20px;
@@ -56,6 +67,7 @@ form {
   font-weight: 600;
 }
 
+  /* Remember me */
   .remember-me {
   display: flex;
   align-items: center;
@@ -87,6 +99,7 @@ input[type="email"] {
   cursor: pointer;
 }
 
+/* Primary submit */
 .submit {
   width: 100%;
   padding: 10px;
@@ -131,6 +144,7 @@ input[type="email"] {
 }
 
 
+/* Reset password */
 .reset-password-box {
   width: 100%;
   max-width: 400px;
@@ -149,6 +163,7 @@ input[type="email"] {
 }
 
 
+/* Secondary submit */
 .submit-new{
   width: 100%;                /* takes full width of container */
   padding: 12px;
@@ -364,6 +379,90 @@ form input {
   position: sticky;
   top: 0;
   height: 100vh;
+}
+
+/* Notifications */
+.notif-container {
+  margin-top: 10px;
+  position: relative;
+}
+
+.notif-bell {
+  width: 100%;
+  background: #3498DB; /* theme blue */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #E74C3C;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.notif-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 10px;
+  z-index: 10;
+}
+
+.notif-header {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2C3E50;
+}
+
+.notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.notif-item a {
+  display: block;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #2C3E50;
+}
+
+.notif-item a:hover {
+  background: #f3f6fb;
+}
+
+/* Content header with right-aligned actions */
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Compact bell when used in content header */
+.content-header .notif-container { margin-top: 0; }
+.content-header .notif-bell {
+  width: auto;
+  padding: 8px 12px;
+  border-radius: 12px;
 }
 
 /* Admin info */
@@ -618,6 +717,11 @@ form input {
   color: #fff;
 }
 
+.status.rejected {
+  background: #E74C3C;
+  color: #fff;
+}
+
 /* Profile Page */
 .profile-card {
   max-width: 600px;
@@ -674,9 +778,16 @@ form input {
 }
 
 
+/* Generic form text styling */
+label {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+}
 
-
-
-  
-
-
+.input-box,
+.certificate-box {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+/* End of stylesheet */

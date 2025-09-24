@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expert Review</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+
+</head>
+<body>
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="admin.html">Registered Accounts</a>
+      <a href="approval.html">Account Approval Panel</a>
+    </div>
+    <div class="profile-icon">
+      <img src="images/profile.png" alt="Profile">
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>Review Expert Registration</h2>
+
+    <!-- Info Display -->
+    <div id="expert-info">
+      <label>First Name</label>
+      <div class="input-box" id="firstNameBox">Loading...</div>
+
+      <label>Last Name</label>
+      <div class="input-box" id="lastNameBox">Loading...</div>
+
+      <label>Email</label>
+      <div class="input-box" id="emailBox">Loading...</div>
+
+      <label>Role/Expertise</label>
+      <div class="input-box" id="expertiseBox">Loading...</div>
+
+      <label>Department Address</label>
+      <div class="input-box" id="addressBox">Loading...</div>
+
+      <!-- Certificate -->
+    <label>Certificate</label>
+    <div class="certificate-box">
+    <a id="certificateLink" href="#" target="_blank">
+        <img id="certificatePreview" src="images/certificate.png" alt="Certificate" style="cursor:pointer;">
+    </a>
+    </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="buttons">
+      <button id="approveBtn" class="approve">✅ Approve</button>
+      <button id="rejectBtn" class="reject">❌ Reject</button>
+    </div>
+  </div>
+
+  <!-- Firebase Script -->
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.replace("admin-login.html");
+      }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const expertId = params.get("id");
+
+    async function loadExpert() {
+      if (!expertId) {
+        alert("No expert ID provided!");
+        return;
+      }
+
+      const docRef = doc(db, "experts", expertId);
+      const snapshot = await getDoc(docRef);
+
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        document.getElementById("firstNameBox").textContent = data.firstName || "N/A";
+        document.getElementById("lastNameBox").textContent = data.lastName || "N/A";
+        document.getElementById("emailBox").textContent = data.email || "N/A";
+        document.getElementById("expertiseBox").textContent = data.expertise || "N/A";
+        document.getElementById("addressBox").textContent = data.address || "N/A";
+
+        if (data.certificateUrl) {
+          document.getElementById("certificatePreview").src = data.certificateUrl;
+          document.getElementById("certificateLink").href = data.certificateUrl;
+        }
+      } else {
+        alert("Expert not found!");
+      }
+    }
+
+    document.getElementById("approveBtn").addEventListener("click", async () => {
+      await updateDoc(doc(db, "experts", expertId), { status: "Approved" });
+      alert("Expert approved ✅");
+      window.location.href = "approval.html";
+    });
+
+    document.getElementById("rejectBtn").addEventListener("click", async () => {
+      await updateDoc(doc(db, "experts", expertId), { status: "Rejected" });
+      alert("Expert rejected ❌");
+      window.location.href = "approval.html";
+    });
+
+    loadExpert();
+
+    // Back-button protection after logout
+    window.addEventListener('popstate', () => {
+      if (!auth.currentUser) {
+        window.location.replace('admin-login.html');
+      }
+    });
+  </script>
+</body>
+</html>

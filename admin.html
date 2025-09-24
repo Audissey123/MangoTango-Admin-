@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin</title>
   <link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
 </head>
 <body>
   <!-- Top Navigation -->
@@ -17,6 +20,7 @@
       <a href="admin.html">Technicians</a>
       <a href="#">Client</a>
       <a href="#">Reports</a>
+      <a href="admin-login.html" class="logout-link">Logout</a>
     </div>
     <div class="profile-icon">
       <img class="profile-icon img" src="images/profile.png">
@@ -61,15 +65,22 @@
   </div>
 
   <script type="module">
-  import { db } from "./firebase-config.js";
+  import { db, auth } from "./firebase-config.js";
   import { collection, getDocs } 
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.replace("admin-login.html");
+    }
+  });
 
   async function loadExperts() {
     const expertsTable = document.querySelector(".approval-table tbody");
     expertsTable.innerHTML = "";
 
-    let total = 0, approved = 0, pending = 0;
+    let total = 0, approved = 0, pending = 0, rejected = 0;
 
     try {
       const snapshot = await getDocs(collection(db, "experts"));
@@ -77,12 +88,13 @@
         const data = doc.data();
         total++;
 
-        let status = (data.status === "Approved") ? "Approved" : "Pending";
-        if (status === "Approved") {
-          approved++;
-        } else {
-          pending++;
-        }
+        let status = "Pending";
+        if (data.status === "Approved") status = "Approved";
+        else if (data.status === "Rejected") status = "Rejected";
+
+        if (status === "Approved") approved++;
+        if (status === "Pending") pending++;
+        if (status === "Rejected") rejected++;
 
         expertsTable.innerHTML += `
           <tr>
@@ -107,7 +119,24 @@
     alert("View profile of expert with ID: " + id);
   };
 
-  window.addEventListener("DOMContentLoaded", loadExperts);
+  window.addEventListener("DOMContentLoaded", () => {
+    loadExperts();
+    const logout = document.querySelector('.logout-link');
+    if (logout) {
+      logout.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        window.location.replace('admin-login.html');
+      });
+    }
+  });
+
+  // Block navigating back to this page after logout
+  window.addEventListener('popstate', () => {
+    if (!auth.currentUser) {
+      window.location.replace('admin-login.html');
+    }
+  });
 </script>
 </body>
 </html>

@@ -12,7 +12,7 @@ const firebaseConfig = {
   authDomain: "mangotango-mobile.firebaseapp.com",
   databaseURL: "https://mangotango-mobile-default-rtdb.firebaseio.com",
   projectId: "mangotango-mobile",
-  storageBucket: "mangotango-mobile.firebasestorage.com", // Corrected .com
+  storageBucket: "mangotango-mobile.appspot.com",
   messagingSenderId: "85435573414",
   appId: "1:85435573414:web:37fb969be0df109a974067",
   measurementId: "G-E2TX3PEMFY"
