@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangoTango Admin System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+  <div class="container">
+    <div class="login-box">
+      <img src="images/mango.png" class="Logo" alt="MangoTango Logo">
+      <h2>MangoTango Admin System</h2>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <p>Welcome to the MangoTango Technician Management System</p>
+        <a href="admin-login.html" class="submit" style="display: inline-block; text-decoration: none; padding: 10px 20px; margin: 10px;">
+          🔐 Admin Login
+        </a>
+        <a href="email-test.html" class="submit" style="display: inline-block; text-decoration: none; padding: 10px 20px; margin: 10px; background: #28a745;">
+          📧 Test Email Setup
+        </a>
+      </div>
+
+      <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px; font-size: 14px;">
+        <h4>🚀 How to Run This Project</h4>
+        <ol style="text-align: left; margin: 10px 0;">
+          <li><strong>Using VS Code Live Server:</strong>
+            <ul>
+              <li>Install "Live Server" extension</li>
+              <li>Right-click this file → "Open with Live Server"</li>
+            </ul>
+          </li>
+          <li><strong>Using Python:</strong>
+            <ul>
+              <li>Open terminal in this folder</li>
+              <li>Run: <code>python -m http.server 8000</code></li>
+              <li>Open: <code>http://localhost:8000</code></li>
+            </ul>
+          </li>
+          <li><strong>Using Node.js:</strong>
+            <ul>
+              <li>Install: <code>npm install -g http-server</code></li>
+              <li>Run: <code>http-server</code></li>
+            </ul>
+          </li>
+        </ol>
+        
+        <h4>🔑 Admin Credentials</h4>
+        <ul style="text-align: left;">
+          <li><strong>Email:</strong> admin@mangotango.com</li>
+          <li><strong>Password:</strong> admin123</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = 'admin-login.html';
+    }, 5000);
+  </script>
+</body>
+</html>

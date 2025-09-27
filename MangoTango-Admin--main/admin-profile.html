@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </a>
+
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
+
+      <a href="pending.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Pending Accounts</span>
+      </a>
+
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
+
+      <a href="admin-login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <div class="content-header">
+        <h1>Admin Profile</h1>
+        <div class="notif-container">
+          <button class="notif-bell" aria-label="Notifications">🔔
+            <span class="notif-badge" hidden>0</span>
+          </button>
+          <div class="notif-panel" hidden>
+            <div class="notif-header">Notifications</div>
+            <ul class="notif-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="profile-box">
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-header">
+          <img src="images/profile.png" alt="Admin Photo" class="profile-pic">
+          <h2 id="adminName">Loading...</h2>
+          <p class="role" id="adminRole">Loading...</p>
+        </div>
+        
+        <div class="profile-info">
+          <h3>Personal Information</h3>
+          <p><strong>Email:</strong> <span id="adminEmail">Loading...</span></p>
+          <p><strong>Phone:</strong> <span id="adminPhone">Loading...</span></p>
+          <p><strong>Address:</strong> <span id="adminAddress">Loading...</span></p>
+        </div>
+
+        <div class="profile-info">
+          <h3>Account Details</h3>
+          <p><strong>Username:</strong> <span id="adminUsername">Loading...</span></p>
+          <p><strong>Role:</strong> <span id="adminRole2">Loading...</span></p>
+          <p><strong>Joined:</strong> <span id="adminJoined">Loading...</span></p>
+        </div>
+
+        <div class="profile-actions">
+          <button id="editBtn" class="approve">Edit Profile</button>
+          <button id="saveBtn" class="approve" style="display:none;">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initNotifications } from "./notifications.js";
+
+    const fields = {
+      name: document.getElementById("adminName"),
+      role: document.getElementById("adminRole"),
+      email: document.getElementById("adminEmail"),
+      phone: document.getElementById("adminPhone"),
+      address: document.getElementById("adminAddress"),
+      username: document.getElementById("adminUsername"),
+      role2: document.getElementById("adminRole2"),
+      joined: document.getElementById("adminJoined"),
+    };
+
+    const editBtn = document.getElementById("editBtn");
+    const saveBtn = document.getElementById("saveBtn");
+
+    let adminRef = null;
+
+    async function loadProfile() {
+      if (!adminRef) return;
+      const snapshot = await getDoc(adminRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        fields.name.textContent = data.name || "Administration 1";
+        fields.role.textContent = data.role || "System Administrator";
+        fields.email.textContent = data.email || "admin@mangotango.com";
+        fields.phone.textContent = data.phone || "+1 (555) 123-4567";
+        fields.address.textContent = data.address || "MangoTango Headquarters, Tech City";
+        fields.username.textContent = data.username || "admin";
+        fields.role2.textContent = data.role || "System Administrator";
+        fields.joined.textContent = data.joined || "January 2024";
+      } else {
+        // Create initial admin profile if it doesn't exist
+        const initialData = {
+          name: "Administration 1",
+          role: "System Administrator",
+          email: "admin@mangotango.com",
+          phone: "+1 (555) 123-4567",
+          address: "MangoTango Headquarters, Tech City",
+          username: "admin",
+          joined: "January 2024",
+          createdAt: new Date().toISOString()
+        };
+        
+        await setDoc(adminRef, initialData);
+        
+        // Load the newly created data
+        fields.name.textContent = initialData.name;
+        fields.role.textContent = initialData.role;
+        fields.email.textContent = initialData.email;
+        fields.phone.textContent = initialData.phone;
+        fields.address.textContent = initialData.address;
+        fields.username.textContent = initialData.username;
+        fields.role2.textContent = initialData.role;
+        fields.joined.textContent = initialData.joined;
+      }
+    }
+
+    function makeEditable() {
+      Object.values(fields).forEach(el => {
+        const text = el.textContent;
+        el.innerHTML = `<input type="text" value="${text}">`;
+      });
+      editBtn.style.display = "none";
+      saveBtn.style.display = "inline-block";
+    }
+
+    async function saveProfile() {
+      const updatedData = {
+        name: fields.name.querySelector("input").value,
+        role: fields.role.querySelector("input").value,
+        email: fields.email.querySelector("input").value,
+        phone: fields.phone.querySelector("input").value,
+        address: fields.address.querySelector("input").value,
+        username: fields.username.querySelector("input").value,
+        joined: fields.joined.querySelector("input").value,
+      };
+
+      await updateDoc(adminRef, updatedData);
+      alert("Profile updated!");
+
+      loadProfile();
+      editBtn.style.display = "inline-block";
+      saveBtn.style.display = "none";
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user || user.email !== "admin@mangotango.com") {
+        window.location.href = "admin-login.html";
+      } else {
+        adminRef = doc(db, "admins", user.uid);
+        loadProfile();
+      }
+    });
+
+    document.querySelector(".logout-link").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.replace("admin-login.html");
+    });
+
+    editBtn.addEventListener("click", makeEditable);
+    saveBtn.addEventListener("click", saveProfile);
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initNotifications(db);
+    });
+
+    window.addEventListener('popstate', () => {
+      if (!auth.currentUser) {
+        window.location.replace('admin-login.html');
+      }
+    });
+  </script>
+</body>
+</html>

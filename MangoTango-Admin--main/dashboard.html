@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="admin-profile.html" class="admin-info" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <img src="images/profile.png" alt="Profile" class="icon">
+        <span>Administration 1</span>
+      </a>
+
+      <a href="dashboard.html" class="sidebar-link">
+        <img src="images/home.png" alt="Dashboard" class="icon">
+        <span>Dashboard</span>
+      </a>
+
+      <a href="pending.html" class="sidebar-link">
+        <img src="images/users.png" alt="Registered Accounts" class="icon">
+        <span>Pending Accounts</span>
+      </a>
+
+      <a href="approval.html" class="sidebar-link">
+        <img src="images/approve.png" alt="Account Approval Panel" class="icon">
+        <span>Account Approval Panel</span>
+      </a>
+
+      <a href="admin-login.html" class="sidebar-link logout-link">
+        <img src="images/logout-ic.png" alt="Logout" class="icon">
+        <span>Logout</span>
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <div class="content-header">
+        <h1>Dashboard</h1>
+        <div class="notif-container">
+          <button class="notif-bell" aria-label="Notifications">🔔
+            <span class="notif-badge" hidden>0</span>
+          </button>
+          <div class="notif-panel" hidden>
+            <div class="notif-header">Notifications</div>
+            <ul class="notif-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-box">
+        <img src="images/profile.png" alt="Profile Picture" class="profile-pic">
+        <p class="admin-name">Administration 1</p>
+      </div>
+
+      <div class="stats">
+        <div class="card">
+          <h3>Registered Technician</h3>
+          <p class="number" id="registeredCount">0</p>
+        </div>
+        <a href="approval.html" class="card">
+          <h3>Pending Approvals</h3>
+          <p class="number" id="pendingCount">0</p>
+        </a>
+      </div>
+
+      <div class="chart-card">
+        <h3>New Registrations Over Time</h3>
+        <canvas id="registrationsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import { collection, onSnapshot }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { signOut, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { initNotifications } from "./notifications.js";
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user || user.email !== "admin@mangotango.com") {
+        window.location.href = "admin-login.html";
+      }
+    });
+
+    document.querySelector(".logout-link").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await signOut(auth);
+      window.location.replace("admin-login.html");
+    });
+
+    function loadStats() {
+      const expertsRef = collection(db, "technician");
+
+      onSnapshot(expertsRef, (snapshot) => {
+        console.log("Dashboard: Received snapshot with", snapshot.size, "documents");
+        let approvedCount = 0;
+        let pendingCount = 0;
+        const monthCounts = {};
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          console.log("Dashboard: Document data:", data);
+          if (data.status === "Approved") {
+            approvedCount++;
+          }
+          if (data.status === "Pending") {
+            pendingCount++;
+          }
+
+          let dateObj = null;
+          if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+            dateObj = data.createdAt.toDate();
+          } else if (data.registrationDate) {
+            const parts = String(data.registrationDate).split('-');
+            if (parts.length === 3) {
+              dateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            }
+          }
+          if (dateObj) {
+            const month = dateObj.toLocaleString("default", { month: "short" });
+            monthCounts[month] = (monthCounts[month] || 0) + 1;
+          }
+        });
+
+        console.log("Dashboard: Counts - Approved:", approvedCount, "Pending:", pendingCount);
+        document.getElementById("registeredCount").textContent = approvedCount;
+        document.getElementById("pendingCount").textContent = pendingCount;
+
+        const labels = Object.keys(monthCounts);
+        const dataPoints = Object.values(monthCounts);
+        renderChart(labels, dataPoints);
+      }, (error) => {
+        console.error("Dashboard: Error fetching data:", error);
+      });
+    }
+
+    function renderChart(labels, dataPoints) {
+      const ctx = document.getElementById('registrationsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Registrations',
+            data: dataPoints,
+            borderColor: '#8B7355',
+            backgroundColor: 'rgba(139, 115, 85, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#8B7355',
+            pointBorderColor: '#8B7355',
+            pointHoverBackgroundColor: '#F0E68C',
+            pointHoverBorderColor: '#8B7355'
+          }]
+        },
+        options: {
+          plugins: { 
+            legend: { 
+              display: true,
+              labels: {
+                color: '#8B7355',
+                font: {
+                  family: 'Roboto, sans-serif'
+                }
+              }
+            } 
+          },
+          scales: {
+            y: { 
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(139, 115, 85, 0.1)'
+              },
+              ticks: {
+                color: '#8B7355',
+                font: {
+                  family: 'Roboto, sans-serif'
+                }
+              }
+            },
+            x: { 
+              grid: { display: false },
+              ticks: {
+                color: '#8B7355',
+                font: {
+                  family: 'Roboto, sans-serif'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user && user.email === "admin@mangotango.com") {
+          await Promise.all([loadStats(), initNotifications(db)]);
+        }
+      });
+    });
+
+    window.addEventListener('popstate', () => {
+      if (!auth.currentUser) {
+        window.location.replace('admin-login.html');
+      }
+    });
+  </script>
+</body>
+</html>
