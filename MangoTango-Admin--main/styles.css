@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&family=Open+Sans:wght@400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&family=Open+Sans:wght@400&display=swap');
 
 html {
   height: 100%;
@@ -8,7 +8,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(135deg, #FFF8DC, #F5DEB3);
+  background: linear-gradient(135deg, #E8F4FD, #D1E7DD);
   color: #333;
   height: 100%;
 }
@@ -38,7 +38,7 @@ h2 {
   font-family: Arial, sans-serif;
   text-align: center;
   margin-bottom: 20px;
-  color: #8B7355;
+  color: #6B9BD2;
 }
 
 form {
@@ -52,7 +52,7 @@ form {
   text-align: left;
   margin-bottom: 20px;
   margin-top: 20px;
-  color: #8B7355;
+  color: #6B9BD2;
   font-weight: 600;
 }
 
@@ -93,19 +93,19 @@ input[type="email"] {
 }
 
 .notification.success {
-  background: linear-gradient(135deg, #F0E68C, #DDD8B8);
-  color: #8B7355;
+  background: linear-gradient(135deg, #A8D8EA, #B8E6B8);
+  color: #4A6B8A;
 }
 
 .notification.error {
-  background: linear-gradient(135deg, #F4A460, #DEB887);
-  color: #8B4513;
+  background: linear-gradient(135deg, #F0A3A3, #E8B4B4);
+  color: #8B4A4A;
 }
 
 .notification button {
   background: none;
   border: none;
-  color: #8B7355;
+  color: #4A6B8A;
   font-size: 18px;
   cursor: pointer;
   padding: 0;
@@ -387,8 +387,8 @@ input[type="email"] {
 .submit {
   width: 100%;
   padding: 10px;
-  background-color: #F0E68C;
-  color: #8B7355;
+  background-color: #A8D8EA;
+  color: #4A6B8A;
   font-size: 15px;
   font-weight: bold;
   border: none;
@@ -399,7 +399,7 @@ input[type="email"] {
 }
 
 .submit:hover {
-  background-color: #DDD8B8;
+  background-color: #B8E6B8;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
@@ -457,7 +457,7 @@ input[type="email"] {
 
 .submit-new:hover {
   background: #2563eb;
-}
+} 
 
 .remember {
   display: block;
@@ -669,21 +669,21 @@ button {
 }
 
 .reject {
-  background-color: #DEB887;
-  color: #8B4513;
+  background-color: #E8B4B4;
+  color: #8B4A4A;
 }
 
 .reject:hover {
-  background-color: #F4A460;
+  background-color: #F0A3A3;
 }
 
 .approve {
-  background-color: #F0E68C;
-  color: #8B7355;
+  background-color: #A8D8EA;
+  color: #4A6B8A;
 }
 
 .approve:hover {
-  background-color: #DDD8B8;
+  background-color: #B8E6B8;
 }
 
 .layout {
@@ -693,7 +693,7 @@ button {
 
 .sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #D2B48C, #BC9A6A);
+  background: linear-gradient(180deg, #b8c0f0, #a5b5e7);
   padding: 25px 15px;
   display: flex;
   flex-direction: column;
@@ -711,8 +711,8 @@ button {
 
 .notif-bell {
   width: 100%;
-  background: #F0E68C;
-  color: #8B7355;
+  background: #A8D8EA;
+  color: #4A6B8A;
   border: none;
   border-radius: 10px;
   padding: 10px 12px;
@@ -726,8 +726,8 @@ button {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #DEB887;
-  color: #8B4513;
+  background: #E8B4B4;
+  color: #8B4A4A;
   border-radius: 999px;
   padding: 2px 6px;
   font-size: 12px;
@@ -786,13 +786,13 @@ button {
   width: auto;
   padding: 8px 12px;
   border-radius: 12px;
-  background: #F0E68C;
-  color: #8B7355;
+  background: #A8D8EA;
+  color: #4A6B8A;
   transition: all 0.3s ease;
 }
 
 .content-header .notif-bell:hover {
-  background: #DDD8B8;
+  background: #B8E6B8;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -894,8 +894,8 @@ button {
 
 .card {
   flex: 1;
-  background: linear-gradient(135deg, #F0E68C, #DDD8B8);
-  color: #8B7355;
+  background: linear-gradient(135deg, #A8D8EA, #B8E6B8);
+  color: #4A6B8A;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -904,8 +904,8 @@ button {
 
 .card2 {
   flex: 1;
-  background: linear-gradient(135deg, #FFF8DC, #F5DEB3);
-  color: #8B4513;
+  background: linear-gradient(135deg, #E8F4FD, #D1E7DD);
+  color: #6B9BD2;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -916,7 +916,7 @@ button {
   margin: 0 0 10px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #8B7355;
+  color: #4A6B8A;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -924,7 +924,7 @@ button {
 .card .number {
   font-size: 32px;
   font-weight: 700;
-  color: #8B7355;
+  color: #4A6B8A;
   margin: 0;
   line-height: 1;
 }
@@ -933,7 +933,7 @@ button {
   margin: 0 0 10px 0;
   font-size: 14px;
   font-weight: 500;
-  color: #8B7355;
+  color: #4A6B8A;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -941,7 +941,7 @@ button {
 .card h2 {
   font-size: 32px;
   font-weight: 700;
-  color: #8B7355;
+  color: #4A6B8A;
   margin: 0;
   line-height: 1;
 }
